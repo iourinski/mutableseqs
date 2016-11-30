@@ -1,58 +1,145 @@
+## Module imitates scala-like behavior of mutable sequences
+##
+## Its original use case was working with largish (but still manageable,
+## i.e. fitting into memory without partitioning) sequencies, the transformed
+## object is destroyed, so such methods will only work with vars, but not with lets
+
+
 # Module mutableseqs
 
 import sequtils,algorithm,tables
+# types
 type 
+  ## since nim's requierement is to have named fields in tuples
+  ## and the module relies on using tuples pretty heavily, we introduce two shortcut types 
   WtPair*[T] = tuple[
     item1: T,
     item2: T,
     weight: float
   ]
- 
+  KVPair*[T,U] = tuple[
+    key: T,
+    value: U
+  ]
 proc groupBy*[T,U](
   input: var seq[T],
   action: proc(x: T): U
-): seq[tuple[a: U, b: seq[T]]] =
+): seq[KVPair[U, seq[T]]] =
+  ## Groups elements of a sequence according to keys that calculated from elements itself
+  ## works with any types that can serve as a key for table, returns sequence of key-value pairs
+  ##
+  ## We can pass named functions or pass a function to generate keys implicitly
+  ## 
+  ## Example:
+  ##
+  ## .. code-block::
+  ##   type   rndTuple = tuple[a: int,b: string] 
+  ##   proc getA(x: rndTuple): int = x.a
+  ##   proc getB(x: rndTuple): string = x.b
+  ##   var a: seq[rndTuple] = @[(1,"a"),(2,"b"),(3,"b"),(4,"a")]
+  ##   assert a.groupBy(proc(x: rndTuple): string = x.b) 
+  ##     == @[
+  ##           (key: a, value: @[(a: 4, b: a), (a: 1, b: a)]), 
+  ##           (key: b, value: @[(a: 3, b: b), (a: 2, b: b)])
+  ##          ]
+  ##   assert a.groupBy(getB) 
+  ##     == @[
+  ##          (key: a, value: @[(a: 4, b: a), (a: 1, b: a)]), 
+  ##          (key: b, value: @[(a: 3, b: b), (a: 2, b: b)])
+  ##          ]
+  ##
+  ##  Can also be used on grouping sequences of primitive types:
+  ## .. code-block::
+  ##   var g =  @[1,2,-3,3,4,5,-5]
+  ##   assert g.groupBy(proc(x: int): int = x*x ) == 
+  ##      @[
+  ##        (key: 25, value: @[-5, 5]), 
+  ##        (key: 16, value: @[4]), 
+  ##        (key: 9, value: @[3, -3]), 
+  ##        (key: 4, value: @[2]), 
+  ##        (key: 1, value: @[1])
+  ##      ]      
+    
+  result = newSeq[KVPair[U,seq[T]]]()
   var
-    result = newSeq[tuple[a: U, b: seq[T]]]()
     ind: int = 0
     idxTable: Table[U, int] = initTable[U, int]()
     lx = input.high
   for idx in countdown(lx, 0):
     var item = input[idx]
     if (idxTable.hasKey(action(item))):
-       result[idxTable[action(item)]].b.add(item)
+       result[idxTable[action(item)]].value.add(item)
     else:
       var 
         i = action(item)
         emptyS = newSeq[T]()
       emptyS.add(item)
-      var  newTuple: tuple[a: U, b: seq[T]] = (i, emptyS)
+      var  newTuple: KVPair[U,seq[T]] = (i, emptyS)
       result.add(newTuple)
       idxTable.add(action(item), ind)
       ind = ind + 1
     input.delete(idx, idx)  
   return result
 
+proc keys*[T,U](x: seq[KVPair[T,U]]): seq[T] = 
+  ## Convenience function, works with results of transformations: returns sequence of keys
+  ## generated during grouping etc
+  ## 
+  ## .. code-block::
+  ##     assert a.groupBy(getB).keys == @[a,b]
+  ##
+ 
+  result = newSeq[T]()
+  for y in x:
+    result.add(y.key)
+  return result
+proc values*[T,U](x: seq[KVPair[T,U]]): seq[U] =
+  ## Same as keys, but returns values:
+  ##
+  ## .. code-block::
+  ##    assert a.groupBy(getB).values ==
+  ##      @[
+  ##        @[(a: 4, b: a), (a: 1, b: a)], 
+  ##        @[(a: 3, b: b), (a: 2, b: b)]
+  ##      ]
+  result = newSeq[U]()
+  for y in x:
+    result.add(y.value)
+  return result
+
 proc groupByReducing*[T, U, V](
   input: var seq[T],
   action: proc( x: T): U,
   transf: proc(x: T): V
-): seq[tuple[a: U, b: seq[V]]] =
+): seq[KVPair[U,seq[V]]] =
+  ## Same as groupBy, but now elements that are mapped into groupes can also be transformed by second function
+  ## 
+  ## .. code-block::
+  ##    let c = a.groupByReducing(
+  ##      proc(x:rndTuple):string = x.b,
+  ##      proc(x:rndTuple):int = x.a
+  ##    )
+  ##    assert c == 
+  ##       @[
+  ##         (key: a, value: @[4, 1]), 
+  ##         (key: b, value: @[3, 2])
+  ##        ]
+
   var 
-    result = newSeq[tuple[a: U, b: seq[V]]]()
+    result = newSeq[KVPair[U,seq[V]]]()
     ind: int = 0
     idxTable = initTable[U, int]()
     lx = input.high
   for i in countdown(lx, 0):
     var item = input[i]
     if (idxTable.hasKey(action(item))):
-       result[idxTable[action(item)]].b.add(transf(item))
+       result[idxTable[action(item)]].value.add(transf(item))
     else:
       var 
         i = action(item)
         emptyS = newSeq[V]()
       emptyS.add(transf(item))
-      var  newTuple: tuple[a: U, b: seq[V]] = (i, emptyS)
+      var  newTuple: KVPair[U, seq[V]] = (i, emptyS)
       result.add(newTuple)
       idxTable.add(action(item), ind)
       ind = ind + 1
@@ -60,6 +147,12 @@ proc groupByReducing*[T, U, V](
   return result
 
 proc flatMap*[T, U]( x: var seq[T], tr: proc(y: T): seq[U]): seq[U] =
+  ## Transforms every element of sequence into sequence of elements and combines them into a flat sequence
+  ##
+  ## .. code-block::
+  ##      var v = @[("a",@[1,3,4],0.0),("b",@[3,4,5],4.6)]
+  ##      assert v.flatMap(proc(x: tuple[a:string,b:seq[int],c:float]): seq[int]= x[1]) ==
+  ##        @[3, 4, 5, 1, 3, 4] 
   var 
     result: seq[U] = newSeq[U]()
     lx = x.high
@@ -71,15 +164,19 @@ proc flatMap*[T, U]( x: var seq[T], tr: proc(y: T): seq[U]): seq[U] =
       result.add(z)
     x.delete(i,i)
   return result
-
-proc flatten*[T, U](x: seq[tuple[a: U, b: seq[T]]]): seq[T] =
-  var result: seq[T] = newSeq[T]()
-  for item in x:
-    for subitem in item.b:
-      result.add(subitem)
-  return result
+# this functionality may be achieved by using flatMap
+#proc flatten*[T, U](x: seq[tuple[a: U, b: seq[T]]]): seq[T] =
+#  var result: seq[T] = newSeq[T]()
+#  for item in x:
+#    for subitem in item.b:
+#      result.add(subitem)
+#  return result
 
 proc transform*[T, U](x: var seq[T], act: proc(y: T): U): seq[U] =
+  ## Same as apply from sequtils, but can produce a sequence of different type, destroys input to save space
+  ## .. code-block::
+  ##    var s = @[1,2,4,5]
+  ##    assert s.transform(proc(x: int): float = 1.0 / x.float) == @[1.0,0.5,0.25,0.2]
   var 
     result = newSeq[U]()
     l = x.len - 1
@@ -92,8 +189,34 @@ proc transform*[T, U](x: var seq[T], act: proc(y: T): U): seq[U] =
   return result
 
 proc makePairs*[T, U](
-  x: seq[T], tr: proc(zz: T): U, wt: proc (zz: T): float
+   x: seq[T], tr: proc(zz: T): U, wt: proc (zz: T, yy: T): float
 ): seq[WtPair[U]] = 
+  ## Generates weighted pairs from elements of a sequence, accoring to procedures passed
+  ## returns sequence of WtPair. tr function that transforms elements (before pairing), wt calculates each
+  ## pair's weight
+  ## 
+  ## .. code-block::
+  ## 
+  ##      var 
+  ##        j = @[("a",1),("b",2),("c",3)]
+  ##        k = j.makePairs(
+  ##          proc(
+  ##            x: tuple[a: string,b: int]): string = x.a, 
+  ##              proc(
+  ##                x: tuple[a: string, b: int],
+  ##                y: tuple[a: string, b: int]
+  ##              ): float = 1.0 / (y.b.float + x.b.float)
+  ##          )
+  ##      assert k == 
+  ##        @[
+  ##          (item1: c, item2: a, weight: 0.25), 
+  ##          (item1: a, item2: c, weight: 0.25), 
+  ##          (item1: c, item2: b, weight: 0.2), 
+  ##          (item1: b, item2: c, weight: 0.2), 
+  ##          (item1: b, item2: a, weight: 0.3333333333333333), 
+  ##          (item1: a, item2: b, weight: 0.3333333333333333)
+  ##        ]
+  
   result = newSeq[WtPair[U]]()
   var lx = x.high
   for i in countdown(lx, 0):
@@ -104,8 +227,8 @@ proc makePairs*[T, U](
         t1,t2: WtPair[U]
         first: U = tr(y)
         second: U = tr(z)
-        weight: float = wt(y)
-
+        weight: float = wt(y,z)
+      
       if first != second:
          t1 = (first,second,weight)
          t2 = (second,first,weight)
@@ -114,6 +237,7 @@ proc makePairs*[T, U](
   return result
 
 proc take*[T](x: var seq[T], numIt: int): seq[T] =
+  ## returns n first elements of sequence
   result = newSeq[T]()
   for i in countup(0, numIt - 1):
     result.add(x[i])
