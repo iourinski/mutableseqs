@@ -1236,6 +1236,8 @@ function main() {
   <li><a class="reference" href="#groupByReducing,seq[T],proc(T),proc(T)"
     title="groupByReducing*[T, U, V](input: var seq[T]; action: proc (x: T): U;
                         transf: proc (x: T): V): seq[KVPair[U, seq[V]]]"><wbr />group<wbr />By<wbr />Reducing<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#groupByKeeping,seq[T],proc(T)"
+    title="groupByKeeping*[T, U](input: seq[T]; action: proc (x: T): U): seq[KVPair[T, U]]"><wbr />group<wbr />By<wbr />Keeping<span class="attachedType" style="visibility:hidden"></span></a></li>
   <li><a class="reference" href="#flatMap,seq[T],proc(T)"
     title="flatMap*[T, U](x: var seq[T]; tr: proc (y: T): seq[U]): seq[U]"><wbr />flat<wbr />Map<span class="attachedType" style="visibility:hidden"></span></a></li>
   <li><a class="reference" href="#transform,seq[T],proc(T)"
@@ -1244,6 +1246,22 @@ function main() {
     title="makePairs*[T, U](x: seq[T]; tr: proc (zz: T): U; wt: proc (zz: T; yy: T): float): seq[WtPair[U]]"><wbr />make<wbr />Pairs<span class="attachedType" style="visibility:hidden"></span></a></li>
   <li><a class="reference" href="#take,seq[T],int"
     title="take*[T](x: var seq[T]; numIt: int): seq[T]"><wbr />take<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#flatten,seq[KVPair[U,seq[T]]]"
+    title="flatten*[T, U](x: seq[KVPair[U, seq[T]]]): seq[T]"><wbr />flatten<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#insertSort,openarray[T],proc(T,T)"
+    title="insertSort*[T](a: var openarray[T]; cmp: proc (x, y: T): bool)"><wbr />insert<wbr />Sort<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#insertSort,openarray[T]"
+    title="insertSort*[T](a: var openarray[T])"><wbr />insert<wbr />Sort<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#shuffle,seq[T]"
+    title="shuffle*[T](x: var seq[T]): seq[T]"><wbr />shuffle<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#clone,seq[T]"
+    title="clone*[T](x: seq[T]): seq[T]"><wbr />clone<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#extract,seq[T],proc(T)"
+    title="extract*[T, U](x: seq[T]; extractor: proc (y: T): U): seq[U]"><wbr />extract<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#grep,seq[T],proc(T)"
+    title="grep*[T](x: seq[T]; f: proc (y: T): bool): seq[T]"><wbr />grep<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#getMedian,seq[T],proc(T,T)"
+    title="getMedian*[T](x: var seq[T]; cmp: proc (y, z: T): bool): T"><wbr />get<wbr />Median<span class="attachedType" style="visibility:hidden"></span></a></li>
 
   </ul>
 </li>
@@ -1259,7 +1277,7 @@ function main() {
   <div class="section" id="6">
 <h1><a class="toc-backref" href="#6">Imports</a></h1>
 <dl class="item">
-<a class="reference external" href="sequtils.html">sequtils</a>, <a class="reference external" href="algorithm.html">algorithm</a>, <a class="reference external" href="tables.html">tables</a>
+<a class="reference external" href="sequtils.html">sequtils</a>, <a class="reference external" href="algorithm.html">algorithm</a>, <a class="reference external" href="tables.html">tables</a>, <a class="reference external" href="random.html">random</a>, <a class="reference external" href="times.html">times</a>
 </dl></div>
 <div class="section" id="7">
 <h1><a class="toc-backref" href="#7">Types</a></h1>
@@ -1361,15 +1379,24 @@ class="link-seesrc" target="_blank">Source</a>
 <a href="/edit/devel/mutableseqs.nim#L110" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
+<dt id="groupByKeeping"><a name="groupByKeeping,seq[T],proc(T)"></a><pre><span class="Keyword">proc</span> <span class="Identifier">groupByKeeping</span><span class="Operator">*</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">,</span> <span class="Identifier">U</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">input</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">action</span><span class="Other">:</span> <span class="Keyword">proc</span> <span class="Other">(</span><span class="Identifier">x</span><span class="Other">:</span> <span class="Identifier">T</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">U</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">KVPair</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">,</span> <span class="Identifier">U</span><span class="Other">]</span><span class="Other">]</span></pre></dt>
+<dd>
+Same as groupBy, but the original sequence is not transformed (can pass immutable values to it)
+&nbsp;&nbsp;<a
+href="/tree/master/mutableseqs.nim#L149"
+class="link-seesrc" target="_blank">Source</a>
+<a href="/edit/devel/mutableseqs.nim#L149" class="link-seesrc" target="_blank" >Edit</a>
+
+</dd>
 <dt id="flatMap"><a name="flatMap,seq[T],proc(T)"></a><pre><span class="Keyword">proc</span> <span class="Identifier">flatMap</span><span class="Operator">*</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">,</span> <span class="Identifier">U</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">x</span><span class="Other">:</span> <span class="Keyword">var</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">tr</span><span class="Other">:</span> <span class="Keyword">proc</span> <span class="Other">(</span><span class="Identifier">y</span><span class="Other">:</span> <span class="Identifier">T</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">U</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">U</span><span class="Other">]</span></pre></dt>
 <dd>
 Transforms every element of sequence into sequence of elements and combines them into a flat sequence<pre class = "listing"><span class="Keyword">var</span> <span class="Identifier">v</span> <span class="Operator">=</span> <span class="Operator">@</span><span class="Punctuation">[</span><span class="Punctuation">(</span><span class="StringLit">&quot;a&quot;</span><span class="Punctuation">,</span><span class="Operator">@</span><span class="Punctuation">[</span><span class="DecNumber">1</span><span class="Punctuation">,</span><span class="DecNumber">3</span><span class="Punctuation">,</span><span class="DecNumber">4</span><span class="Punctuation">]</span><span class="Punctuation">,</span><span class="FloatNumber">0.0</span><span class="Punctuation">)</span><span class="Punctuation">,</span><span class="Punctuation">(</span><span class="StringLit">&quot;b&quot;</span><span class="Punctuation">,</span><span class="Operator">@</span><span class="Punctuation">[</span><span class="DecNumber">3</span><span class="Punctuation">,</span><span class="DecNumber">4</span><span class="Punctuation">,</span><span class="DecNumber">5</span><span class="Punctuation">]</span><span class="Punctuation">,</span><span class="FloatNumber">4.6</span><span class="Punctuation">)</span><span class="Punctuation">]</span>
 <span class="Identifier">assert</span> <span class="Identifier">v</span><span class="Operator">.</span><span class="Identifier">flatMap</span><span class="Punctuation">(</span><span class="Keyword">proc</span><span class="Punctuation">(</span><span class="Identifier">x</span><span class="Punctuation">:</span> <span class="Keyword">tuple</span><span class="Punctuation">[</span><span class="Identifier">a</span><span class="Punctuation">:</span><span class="Identifier">string</span><span class="Punctuation">,</span><span class="Identifier">b</span><span class="Punctuation">:</span><span class="Identifier">seq</span><span class="Punctuation">[</span><span class="Identifier">int</span><span class="Punctuation">]</span><span class="Punctuation">,</span><span class="Identifier">c</span><span class="Punctuation">:</span><span class="Identifier">float</span><span class="Punctuation">]</span><span class="Punctuation">)</span><span class="Punctuation">:</span> <span class="Identifier">seq</span><span class="Punctuation">[</span><span class="Identifier">int</span><span class="Punctuation">]</span><span class="Operator">=</span> <span class="Identifier">x</span><span class="Punctuation">[</span><span class="DecNumber">1</span><span class="Punctuation">]</span><span class="Punctuation">)</span> <span class="Operator">==</span>
   <span class="Operator">@</span><span class="Punctuation">[</span><span class="DecNumber">3</span><span class="Punctuation">,</span> <span class="DecNumber">4</span><span class="Punctuation">,</span> <span class="DecNumber">5</span><span class="Punctuation">,</span> <span class="DecNumber">1</span><span class="Punctuation">,</span> <span class="DecNumber">3</span><span class="Punctuation">,</span> <span class="DecNumber">4</span><span class="Punctuation">]</span> </pre>
 &nbsp;&nbsp;<a
-href="/tree/master/mutableseqs.nim#L149"
+href="/tree/master/mutableseqs.nim#L176"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/mutableseqs.nim#L149" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/mutableseqs.nim#L176" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="transform"><a name="transform,seq[T],proc(T)"></a><pre><span class="Keyword">proc</span> <span class="Identifier">transform</span><span class="Operator">*</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">,</span> <span class="Identifier">U</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">x</span><span class="Other">:</span> <span class="Keyword">var</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">act</span><span class="Other">:</span> <span class="Keyword">proc</span> <span class="Other">(</span><span class="Identifier">y</span><span class="Other">:</span> <span class="Identifier">T</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">U</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">U</span><span class="Other">]</span></pre></dt>
@@ -1378,9 +1405,9 @@ Same as apply from sequtils, but can produce a sequence of different type, destr
 assert s.transform(proc(x: int): float = 1.0 / x.float) == @[1.0,0.5,0.25,0.2]</pre>
 
 &nbsp;&nbsp;<a
-href="/tree/master/mutableseqs.nim#L175"
+href="/tree/master/mutableseqs.nim#L202"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/mutableseqs.nim#L175" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/mutableseqs.nim#L202" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="makePairs"><a name="makePairs,seq[T],proc(T),proc(T,T)"></a><pre><span class="Keyword">proc</span> <span class="Identifier">makePairs</span><span class="Operator">*</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">,</span> <span class="Identifier">U</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">x</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">tr</span><span class="Other">:</span> <span class="Keyword">proc</span> <span class="Other">(</span><span class="Identifier">zz</span><span class="Other">:</span> <span class="Identifier">T</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">U</span><span class="Other">;</span> <span class="Identifier">wt</span><span class="Other">:</span> <span class="Keyword">proc</span> <span class="Other">(</span><span class="Identifier">zz</span><span class="Other">:</span> <span class="Identifier">T</span><span class="Other">;</span> <span class="Identifier">yy</span><span class="Other">:</span> <span class="Identifier">T</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">float</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span>
@@ -1406,18 +1433,90 @@ Generates weighted pairs from elements of a sequence, accoring to procedures pas
     <span class="Punctuation">(</span><span class="Identifier">item1</span><span class="Punctuation">:</span> <span class="Identifier">a</span><span class="Punctuation">,</span> <span class="Identifier">item2</span><span class="Punctuation">:</span> <span class="Identifier">b</span><span class="Punctuation">,</span> <span class="Identifier">weight</span><span class="Punctuation">:</span> <span class="FloatNumber">0.3333333333333333</span><span class="Punctuation">)</span>
   <span class="Punctuation">]</span></pre>
 &nbsp;&nbsp;<a
-href="/tree/master/mutableseqs.nim#L191"
+href="/tree/master/mutableseqs.nim#L218"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/mutableseqs.nim#L191" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/mutableseqs.nim#L218" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="take"><a name="take,seq[T],int"></a><pre><span class="Keyword">proc</span> <span class="Identifier">take</span><span class="Operator">*</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">x</span><span class="Other">:</span> <span class="Keyword">var</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">numIt</span><span class="Other">:</span> <span class="Identifier">int</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span></pre></dt>
 <dd>
 returns n first elements of sequence
 &nbsp;&nbsp;<a
-href="/tree/master/mutableseqs.nim#L239"
+href="/tree/master/mutableseqs.nim#L266"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/mutableseqs.nim#L239" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/mutableseqs.nim#L266" class="link-seesrc" target="_blank" >Edit</a>
+
+</dd>
+<dt id="flatten"><a name="flatten,seq[KVPair[U,seq[T]]]"></a><pre><span class="Keyword">proc</span> <span class="Identifier">flatten</span><span class="Operator">*</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">,</span> <span class="Identifier">U</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">x</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">KVPair</span><span class="Other">[</span><span class="Identifier">U</span><span class="Other">,</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">]</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span></pre></dt>
+<dd>
+in a sense &quot;undoing&quot; result of groupBy&quot;
+&nbsp;&nbsp;<a
+href="/tree/master/mutableseqs.nim#L274"
+class="link-seesrc" target="_blank">Source</a>
+<a href="/edit/devel/mutableseqs.nim#L274" class="link-seesrc" target="_blank" >Edit</a>
+
+</dd>
+<dt id="insertSort"><a name="insertSort,openarray[T],proc(T,T)"></a><pre><span class="Keyword">proc</span> <span class="Identifier">insertSort</span><span class="Operator">*</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">a</span><span class="Other">:</span> <span class="Keyword">var</span> <span class="Identifier">openarray</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">cmp</span><span class="Other">:</span> <span class="Keyword">proc</span> <span class="Other">(</span><span class="Identifier">x</span><span class="Other">,</span> <span class="Identifier">y</span><span class="Other">:</span> <span class="Identifier">T</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span><span class="Other">)</span></pre></dt>
+<dd>
+yet another sorting procedure with passed comparison function
+&nbsp;&nbsp;<a
+href="/tree/master/mutableseqs.nim#L284"
+class="link-seesrc" target="_blank">Source</a>
+<a href="/edit/devel/mutableseqs.nim#L284" class="link-seesrc" target="_blank" >Edit</a>
+
+</dd>
+<dt id="insertSort"><a name="insertSort,openarray[T]"></a><pre><span class="Keyword">proc</span> <span class="Identifier">insertSort</span><span class="Operator">*</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">a</span><span class="Other">:</span> <span class="Keyword">var</span> <span class="Identifier">openarray</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">)</span></pre></dt>
+<dd>
+simple sort for values that understand <cite>&lt;</cite> operation
+&nbsp;&nbsp;<a
+href="/tree/master/mutableseqs.nim#L294"
+class="link-seesrc" target="_blank">Source</a>
+<a href="/edit/devel/mutableseqs.nim#L294" class="link-seesrc" target="_blank" >Edit</a>
+
+</dd>
+<dt id="shuffle"><a name="shuffle,seq[T]"></a><pre><span class="Keyword">proc</span> <span class="Identifier">shuffle</span><span class="Operator">*</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">x</span><span class="Other">:</span> <span class="Keyword">var</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span></pre></dt>
+<dd>
+shuffle part of the sequence
+&nbsp;&nbsp;<a
+href="/tree/master/mutableseqs.nim#L304"
+class="link-seesrc" target="_blank">Source</a>
+<a href="/edit/devel/mutableseqs.nim#L304" class="link-seesrc" target="_blank" >Edit</a>
+
+</dd>
+<dt id="clone"><a name="clone,seq[T]"></a><pre><span class="Keyword">proc</span> <span class="Identifier">clone</span><span class="Operator">*</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">x</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span></pre></dt>
+<dd>
+clone a sequence
+&nbsp;&nbsp;<a
+href="/tree/master/mutableseqs.nim#L329"
+class="link-seesrc" target="_blank">Source</a>
+<a href="/edit/devel/mutableseqs.nim#L329" class="link-seesrc" target="_blank" >Edit</a>
+
+</dd>
+<dt id="extract"><a name="extract,seq[T],proc(T)"></a><pre><span class="Keyword">proc</span> <span class="Identifier">extract</span><span class="Operator">*</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">,</span> <span class="Identifier">U</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">x</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">extractor</span><span class="Other">:</span> <span class="Keyword">proc</span> <span class="Other">(</span><span class="Identifier">y</span><span class="Other">:</span> <span class="Identifier">T</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">U</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">U</span><span class="Other">]</span></pre></dt>
+<dd>
+extract something from a sequence
+&nbsp;&nbsp;<a
+href="/tree/master/mutableseqs.nim#L336"
+class="link-seesrc" target="_blank">Source</a>
+<a href="/edit/devel/mutableseqs.nim#L336" class="link-seesrc" target="_blank" >Edit</a>
+
+</dd>
+<dt id="grep"><a name="grep,seq[T],proc(T)"></a><pre><span class="Keyword">proc</span> <span class="Identifier">grep</span><span class="Operator">*</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">x</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">f</span><span class="Other">:</span> <span class="Keyword">proc</span> <span class="Other">(</span><span class="Identifier">y</span><span class="Other">:</span> <span class="Identifier">T</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span></pre></dt>
+<dd>
+simplified imitation of perl's grep
+&nbsp;&nbsp;<a
+href="/tree/master/mutableseqs.nim#L343"
+class="link-seesrc" target="_blank">Source</a>
+<a href="/edit/devel/mutableseqs.nim#L343" class="link-seesrc" target="_blank" >Edit</a>
+
+</dd>
+<dt id="getMedian"><a name="getMedian,seq[T],proc(T,T)"></a><pre><span class="Keyword">proc</span> <span class="Identifier">getMedian</span><span class="Operator">*</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">x</span><span class="Other">:</span> <span class="Keyword">var</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">cmp</span><span class="Other">:</span> <span class="Keyword">proc</span> <span class="Other">(</span><span class="Identifier">y</span><span class="Other">,</span> <span class="Identifier">z</span><span class="Other">:</span> <span class="Identifier">T</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">T</span></pre></dt>
+<dd>
+calculate a median for an array of things based on supplied comparison function
+&nbsp;&nbsp;<a
+href="/tree/master/mutableseqs.nim#L351"
+class="link-seesrc" target="_blank">Source</a>
+<a href="/edit/devel/mutableseqs.nim#L351" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 
@@ -1430,7 +1529,7 @@ class="link-seesrc" target="_blank">Source</a>
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br/>
-        <small>Made with Nim. Generated: 2016-11-30 20:54:47 UTC</small>
+        <small>Made with Nim. Generated: 2016-12-15 14:39:57 UTC</small>
       </div>
     </div>
   </div>
