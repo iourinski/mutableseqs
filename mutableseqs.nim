@@ -7,7 +7,7 @@
 
 # Module mutableseqs
 
-import sequtils,algorithm,tables
+import sequtils, algorithm, tables, random, times
 # types
 type 
   ## since nim's requierement is to have named fields in tuples
@@ -146,6 +146,33 @@ proc groupByReducing*[T, U, V](
     input.delete(i, i)
   return result
 
+proc groupByKeeping*[T,U](
+  input:  seq[T],
+  action: proc(x: T): U
+): seq[KVPair[T,U]] =
+  ## Same as groupBy, but the original sequence is not transformed (can pass immutable values to it)
+  result = newSeq[KVPair[T,U]]()
+  var  
+    ind: int = 0
+    idxTable: Table[U, int] = initTable[U, int]()
+  let lx = input.high
+  if input.len == 0:
+    return result
+  for idx in countdown(lx, 0):
+    let item = input[idx]
+    if (idxTable.hasKey(action(item))):
+       result[idxTable[action(item)]].b.add(item)
+    else:
+      var 
+        i = action(item)
+        emptyS = newSeq[T]()
+      emptyS.add(item)
+      var  newTuple: KVPair[U, seq[T]] = (i, emptyS)
+      result.add(newTuple)
+      idxTable.add(action(item), ind)
+      ind = ind + 1
+  return result
+
 proc flatMap*[T, U]( x: var seq[T], tr: proc(y: T): seq[U]): seq[U] =
   ## Transforms every element of sequence into sequence of elements and combines them into a flat sequence
   ##
@@ -244,3 +271,108 @@ proc take*[T](x: var seq[T], numIt: int): seq[T] =
   x = newSeq[T]()
   return result
 
+proc flatten*[T, U](x: seq[KVPair[U,seq[T]]]): seq[T] =
+  ## in a sense "undoing" result of groupBy"
+  result = newSeq[T]()
+  if x.len == 0:
+    return result
+  for item in x:
+    for subitem in item.b:
+      result.add(subitem)
+  return result
+
+proc insertSort*[T](a: var openarray[T], cmp: proc(x, y: T): bool) =
+  ## yet another sorting procedure with passed comparison function
+  for i in 1 .. < a.len:
+    let value = a[i]
+    var j = i
+    while j > 0 and cmp(value,a[j-1]):
+      a[j] = a[j-1]
+      dec j
+    a[j] = value
+
+proc insertSort*[T](a: var openarray[T]) =
+  ## simple sort for values that understand `<` operation
+  for i in 1 .. < a.len:
+    let value = a[i]
+    var j = i
+    while j > 0 and value < a[j-1]:
+      a[j] = a[j-1]
+      dec j
+    a[j] = value
+
+proc shuffle*[T](x: var seq[T]): seq[T] =
+  ## shuffle part of the sequence
+  result = newSeq[T](x.len)
+  if x.len == 0:
+    return x
+  let 
+    total = x.len 
+  var
+    track = initTable[int,bool]()
+    j = 0
+  randomize()
+  var time = int(epochTime() * 1000000)
+  while time mod 10 == 0:
+    time = (time / 10).toInt
+  var rem =  time mod total
+  while true:
+    var idx =  random(total)
+    if track.contains(idx) == false:
+      track.add(idx,true)
+      result[j] = x[idx]
+      inc(j)
+    if track.len == total:
+      break
+  return result
+
+proc clone* [T] (x: seq[T]): seq[T]  = 
+  ## clone a sequence
+  result = newSeq[T]()
+  for y in x:
+    result.add(y)
+  return result
+
+proc extract* [T,U] (x: seq[T], extractor: proc(y: T): U): seq[U] = 
+  ## extract something from a sequence
+  result = newSeq[U]()
+  for item in x:
+    result.add(extractor(item))
+  return result
+
+proc grep* [T] (x: seq[T], f: proc(y: T): bool): seq[T] = 
+  ## simplified imitation of perl's grep
+  result = newSeq[T]()
+  for y in x:
+    if f(y):
+      result.add(y)
+  return result
+
+proc getMedian* [T](x: var seq[T], cmp: proc(y, z: T): bool): T =
+  ## calculate a median for an array of things based on supplied comparison function
+  insertSort(x, cmp) 
+  var idx: int = 
+    if x.len mod 2 > 0:
+      ((x.len - 1) / 2).int
+    else:
+      (x.len / 2).int
+  return x[idx]
+  
+
+proc min[T](x: seq[T]): T =
+  ## calculate a median for an array of things based on supplied comparison function
+  if x.len == 0:
+    return 
+  var result: T = x[0]
+  for y in x:
+    if y < result:
+        result = y
+  return result
+
+
+proc zipWithIndex[T](x: seq[T]): seq[KVPair[int, T]] = 
+  ## calculate a median for an array of things based on supplied comparison function
+  result = newSeq[KVPair[int,  T]]()
+  for y in 0 .. x.high:
+    result.add((y, x[y]))
+  return result
