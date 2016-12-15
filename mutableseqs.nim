@@ -149,30 +149,28 @@ proc groupByReducing*[T, U, V](
 proc groupByKeeping*[T,U](
   input:  seq[T],
   action: proc(x: T): U
-): seq[KVPair[T,U]] =
+): seq[KVPair[U, seq[T]]] =
   ## Same as groupBy, but the original sequence is not transformed (can pass immutable values to it)
-  result = newSeq[KVPair[T,U]]()
-  var  
+  result = newSeq[KVPair[U,seq[T]]]()
+  var
     ind: int = 0
     idxTable: Table[U, int] = initTable[U, int]()
-  let lx = input.high
-  if input.len == 0:
-    return result
+    lx = input.high
   for idx in countdown(lx, 0):
-    let item = input[idx]
+    var item = input[idx]
     if (idxTable.hasKey(action(item))):
-       result[idxTable[action(item)]].b.add(item)
+       result[idxTable[action(item)]].value.add(item)
     else:
       var 
         i = action(item)
         emptyS = newSeq[T]()
       emptyS.add(item)
-      var  newTuple: KVPair[U, seq[T]] = (i, emptyS)
+      var  newTuple: KVPair[U,seq[T]] = (i, emptyS)
       result.add(newTuple)
       idxTable.add(action(item), ind)
       ind = ind + 1
   return result
-
+  
 proc flatMap*[T, U]( x: var seq[T], tr: proc(y: T): seq[U]): seq[U] =
   ## Transforms every element of sequence into sequence of elements and combines them into a flat sequence
   ##
@@ -265,6 +263,8 @@ proc makePairs*[T, U](
 
 proc take*[T](x: var seq[T], numIt: int): seq[T] =
   ## returns n first elements of sequence
+  if numIt >= x.len:
+    return x
   result = newSeq[T]()
   for i in countup(0, numIt - 1):
     result.add(x[i])
@@ -277,7 +277,7 @@ proc flatten*[T, U](x: seq[KVPair[U,seq[T]]]): seq[T] =
   if x.len == 0:
     return result
   for item in x:
-    for subitem in item.b:
+    for subitem in item.value:
       result.add(subitem)
   return result
 
@@ -358,7 +358,6 @@ proc getMedian* [T](x: var seq[T], cmp: proc(y, z: T): bool): T =
       (x.len / 2).int
   return x[idx]
   
-
 proc min[T](x: seq[T]): T =
   ## calculate a median for an array of things based on supplied comparison function
   if x.len == 0:
@@ -368,7 +367,6 @@ proc min[T](x: seq[T]): T =
     if y < result:
         result = y
   return result
-
 
 proc zipWithIndex[T](x: seq[T]): seq[KVPair[int, T]] = 
   ## calculate a median for an array of things based on supplied comparison function

@@ -1237,7 +1237,7 @@ function main() {
     title="groupByReducing*[T, U, V](input: var seq[T]; action: proc (x: T): U;
                         transf: proc (x: T): V): seq[KVPair[U, seq[V]]]"><wbr />group<wbr />By<wbr />Reducing<span class="attachedType" style="visibility:hidden"></span></a></li>
   <li><a class="reference" href="#groupByKeeping,seq[T],proc(T)"
-    title="groupByKeeping*[T, U](input: seq[T]; action: proc (x: T): U): seq[KVPair[T, U]]"><wbr />group<wbr />By<wbr />Keeping<span class="attachedType" style="visibility:hidden"></span></a></li>
+    title="groupByKeeping*[T, U](input: seq[T]; action: proc (x: T): U): seq[KVPair[U, seq[T]]]"><wbr />group<wbr />By<wbr />Keeping<span class="attachedType" style="visibility:hidden"></span></a></li>
   <li><a class="reference" href="#flatMap,seq[T],proc(T)"
     title="flatMap*[T, U](x: var seq[T]; tr: proc (y: T): seq[U]): seq[U]"><wbr />flat<wbr />Map<span class="attachedType" style="visibility:hidden"></span></a></li>
   <li><a class="reference" href="#transform,seq[T],proc(T)"
@@ -1379,7 +1379,7 @@ class="link-seesrc" target="_blank">Source</a>
 <a href="/edit/devel/mutableseqs.nim#L110" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
-<dt id="groupByKeeping"><a name="groupByKeeping,seq[T],proc(T)"></a><pre><span class="Keyword">proc</span> <span class="Identifier">groupByKeeping</span><span class="Operator">*</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">,</span> <span class="Identifier">U</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">input</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">action</span><span class="Other">:</span> <span class="Keyword">proc</span> <span class="Other">(</span><span class="Identifier">x</span><span class="Other">:</span> <span class="Identifier">T</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">U</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">KVPair</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">,</span> <span class="Identifier">U</span><span class="Other">]</span><span class="Other">]</span></pre></dt>
+<dt id="groupByKeeping"><a name="groupByKeeping,seq[T],proc(T)"></a><pre><span class="Keyword">proc</span> <span class="Identifier">groupByKeeping</span><span class="Operator">*</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">,</span> <span class="Identifier">U</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">input</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">action</span><span class="Other">:</span> <span class="Keyword">proc</span> <span class="Other">(</span><span class="Identifier">x</span><span class="Other">:</span> <span class="Identifier">T</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">U</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">KVPair</span><span class="Other">[</span><span class="Identifier">U</span><span class="Other">,</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">]</span><span class="Other">]</span></pre></dt>
 <dd>
 Same as groupBy, but the original sequence is not transformed (can pass immutable values to it)
 &nbsp;&nbsp;<a
@@ -1394,9 +1394,9 @@ Transforms every element of sequence into sequence of elements and combines them
 <span class="Identifier">assert</span> <span class="Identifier">v</span><span class="Operator">.</span><span class="Identifier">flatMap</span><span class="Punctuation">(</span><span class="Keyword">proc</span><span class="Punctuation">(</span><span class="Identifier">x</span><span class="Punctuation">:</span> <span class="Keyword">tuple</span><span class="Punctuation">[</span><span class="Identifier">a</span><span class="Punctuation">:</span><span class="Identifier">string</span><span class="Punctuation">,</span><span class="Identifier">b</span><span class="Punctuation">:</span><span class="Identifier">seq</span><span class="Punctuation">[</span><span class="Identifier">int</span><span class="Punctuation">]</span><span class="Punctuation">,</span><span class="Identifier">c</span><span class="Punctuation">:</span><span class="Identifier">float</span><span class="Punctuation">]</span><span class="Punctuation">)</span><span class="Punctuation">:</span> <span class="Identifier">seq</span><span class="Punctuation">[</span><span class="Identifier">int</span><span class="Punctuation">]</span><span class="Operator">=</span> <span class="Identifier">x</span><span class="Punctuation">[</span><span class="DecNumber">1</span><span class="Punctuation">]</span><span class="Punctuation">)</span> <span class="Operator">==</span>
   <span class="Operator">@</span><span class="Punctuation">[</span><span class="DecNumber">3</span><span class="Punctuation">,</span> <span class="DecNumber">4</span><span class="Punctuation">,</span> <span class="DecNumber">5</span><span class="Punctuation">,</span> <span class="DecNumber">1</span><span class="Punctuation">,</span> <span class="DecNumber">3</span><span class="Punctuation">,</span> <span class="DecNumber">4</span><span class="Punctuation">]</span> </pre>
 &nbsp;&nbsp;<a
-href="/tree/master/mutableseqs.nim#L176"
+href="/tree/master/mutableseqs.nim#L174"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/mutableseqs.nim#L176" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/mutableseqs.nim#L174" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="transform"><a name="transform,seq[T],proc(T)"></a><pre><span class="Keyword">proc</span> <span class="Identifier">transform</span><span class="Operator">*</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">,</span> <span class="Identifier">U</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">x</span><span class="Other">:</span> <span class="Keyword">var</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">act</span><span class="Other">:</span> <span class="Keyword">proc</span> <span class="Other">(</span><span class="Identifier">y</span><span class="Other">:</span> <span class="Identifier">T</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">U</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">U</span><span class="Other">]</span></pre></dt>
@@ -1405,9 +1405,9 @@ Same as apply from sequtils, but can produce a sequence of different type, destr
 assert s.transform(proc(x: int): float = 1.0 / x.float) == @[1.0,0.5,0.25,0.2]</pre>
 
 &nbsp;&nbsp;<a
-href="/tree/master/mutableseqs.nim#L202"
+href="/tree/master/mutableseqs.nim#L200"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/mutableseqs.nim#L202" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/mutableseqs.nim#L200" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="makePairs"><a name="makePairs,seq[T],proc(T),proc(T,T)"></a><pre><span class="Keyword">proc</span> <span class="Identifier">makePairs</span><span class="Operator">*</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">,</span> <span class="Identifier">U</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">x</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">tr</span><span class="Other">:</span> <span class="Keyword">proc</span> <span class="Other">(</span><span class="Identifier">zz</span><span class="Other">:</span> <span class="Identifier">T</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">U</span><span class="Other">;</span> <span class="Identifier">wt</span><span class="Other">:</span> <span class="Keyword">proc</span> <span class="Other">(</span><span class="Identifier">zz</span><span class="Other">:</span> <span class="Identifier">T</span><span class="Other">;</span> <span class="Identifier">yy</span><span class="Other">:</span> <span class="Identifier">T</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">float</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span>
@@ -1433,18 +1433,18 @@ Generates weighted pairs from elements of a sequence, accoring to procedures pas
     <span class="Punctuation">(</span><span class="Identifier">item1</span><span class="Punctuation">:</span> <span class="Identifier">a</span><span class="Punctuation">,</span> <span class="Identifier">item2</span><span class="Punctuation">:</span> <span class="Identifier">b</span><span class="Punctuation">,</span> <span class="Identifier">weight</span><span class="Punctuation">:</span> <span class="FloatNumber">0.3333333333333333</span><span class="Punctuation">)</span>
   <span class="Punctuation">]</span></pre>
 &nbsp;&nbsp;<a
-href="/tree/master/mutableseqs.nim#L218"
+href="/tree/master/mutableseqs.nim#L216"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/mutableseqs.nim#L218" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/mutableseqs.nim#L216" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="take"><a name="take,seq[T],int"></a><pre><span class="Keyword">proc</span> <span class="Identifier">take</span><span class="Operator">*</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">x</span><span class="Other">:</span> <span class="Keyword">var</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">numIt</span><span class="Other">:</span> <span class="Identifier">int</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span></pre></dt>
 <dd>
 returns n first elements of sequence
 &nbsp;&nbsp;<a
-href="/tree/master/mutableseqs.nim#L266"
+href="/tree/master/mutableseqs.nim#L264"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/mutableseqs.nim#L266" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/mutableseqs.nim#L264" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="flatten"><a name="flatten,seq[KVPair[U,seq[T]]]"></a><pre><span class="Keyword">proc</span> <span class="Identifier">flatten</span><span class="Operator">*</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">,</span> <span class="Identifier">U</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">x</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">KVPair</span><span class="Other">[</span><span class="Identifier">U</span><span class="Other">,</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">]</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span></pre></dt>
@@ -1529,7 +1529,7 @@ class="link-seesrc" target="_blank">Source</a>
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br/>
-        <small>Made with Nim. Generated: 2016-12-15 14:39:57 UTC</small>
+        <small>Made with Nim. Generated: 2016-12-15 18:25:49 UTC</small>
       </div>
     </div>
   </div>
