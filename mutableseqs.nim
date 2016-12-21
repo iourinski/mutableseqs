@@ -107,9 +107,50 @@ proc values*[T,U](x: seq[KVPair[T,U]]): seq[U] =
     result.add(y.value)
   return result
 
+proc getItemVal(x: tuple, id: string): string =
+  ## helper function, not imported
+  for y,z in x.fieldPairs:
+    if y == id:
+      return $z
+
+proc groupBy*[T](
+  input: var seq[T],
+  action: string
+): seq[KVPair[string, seq[T]]] =
+  ## shorter notation for groupBy, only works for tuples, if the sequence is not made of tuples
+  ## an exception is thrown, moreover the keys in result will be cast to string
+  ## in case a more general construction is needed, use "long notation" with full proc call passed
+  ## .. code-bloc
+  ##   type   rndTuple = tuple[a: int,b: string] 
+  ##   proc getA(x: rndTuple): int = x.a
+  ##   proc getB(x: rndTuple): string = x.b
+  ##   var a: seq[rndTuple] = @[(1,"a"),(2,"b"),(3,"b"),(4,"a")]
+  ##   assert a.groupBy(proc(x: rndTuple): string = x.b) 
+  ##     == a.groupBy("b")
+  ##   
+  result = newSeq[KVPair[string,seq[T]]]()
+  var
+    ind: int = 0
+    idxTable: Table[string, int] = initTable[string, int]()
+    lx = input.high
+  for idx in countdown(lx, 0):
+    var item = input[idx]
+    if (idxTable.hasKey(item.getItemVal(action))):
+       result[idxTable[item.getItemVal(action)]].value.add(item)
+    else:
+      var 
+        i = item.getItemVal(action)
+        emptyS = newSeq[T]()
+      emptyS.add(item)
+      var  newTuple: KVPair[string, seq[T]] = (i, emptyS)
+      result.add(newTuple)
+      idxTable.add(item.getItemVal(action), ind)
+      ind = ind + 1
+    input.delete(idx, idx)  
+  return result
 proc groupByReducing*[T, U, V](
   input: var seq[T],
-  action: proc( x: T): U,
+  action: proc(x: T): U,
   transf: proc(x: T): V
 ): seq[KVPair[U,seq[V]]] =
   ## Same as groupBy, but now elements that are mapped into groupes can also be transformed by second function
@@ -146,7 +187,7 @@ proc groupByReducing*[T, U, V](
     input.delete(i, i)
   return result
 
-proc groupByKeeping*[T,U](
+proc groupByKeeping*[T, U](
   input:  seq[T],
   action: proc(x: T): U
 ): seq[KVPair[U, seq[T]]] =
@@ -374,3 +415,6 @@ proc zipWithIndex[T](x: seq[T]): seq[KVPair[int, T]] =
   for y in 0 .. x.high:
     result.add((y, x[y]))
   return result
+
+
+
