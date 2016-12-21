@@ -1365,10 +1365,12 @@ class="link-seesrc" target="_blank">Source</a>
 </dd>
 <dt id="groupBy"><a name="groupBy,seq[T],string"></a><pre><span class="Keyword">proc</span> <span class="Identifier">groupBy</span><span class="Operator">*</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">input</span><span class="Other">:</span> <span class="Keyword">var</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">action</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">KVPair</span><span class="Other">[</span><span class="Identifier">string</span><span class="Other">,</span> <span class="Identifier">seq</span><span class="Other">[</span><span class="Identifier">T</span><span class="Other">]</span><span class="Other">]</span><span class="Other">]</span></pre></dt>
 <dd>
-shorter notation for groupBy, only works for tuples, if the sequence is not made of tuples an exception is thrown, moreover the keys in result will be cast to string in case a more general construction is needed, use &quot;long notation&quot; with full proc call passed .. code-bloc<blockquote><p>type   rndTuple = tuple[a: int,b: string] proc getA(x: rndTuple): int = x.a proc getB(x: rndTuple): string = x.b var a: seq[rndTuple] = @[(1,&quot;a&quot;),(2,&quot;b&quot;),(3,&quot;b&quot;),(4,&quot;a&quot;)]<dl class="docutils"><dt>assert a.groupBy(proc(x: rndTuple): string = x.b)</dt>
-<dd>== a.groupBy(&quot;b&quot;)</dd>
-</dl>
-</p></blockquote>
+shorter notation for groupBy, only works for tuples, if the sequence is not made of tuples an exception is thrown, moreover the keys in result will be cast to string in case a more general construction is needed, use &quot;long notation&quot; with full proc call passed .. code-block:<pre>type   rndTuple = tuple[a: int,b: string]
+proc getA(x: rndTuple): int = x.a
+proc getB(x: rndTuple): string = x.b
+var a: seq[rndTuple] = @[(1,&quot;a&quot;),(2,&quot;b&quot;),(3,&quot;b&quot;),(4,&quot;a&quot;)]
+assert a.groupBy(proc(x: rndTuple): string = x.b)
+  == a.groupBy(&quot;b&quot;)</pre>
 
 &nbsp;&nbsp;<a
 href="/tree/master/mutableseqs.nim#L116"
@@ -1544,7 +1546,7 @@ class="link-seesrc" target="_blank">Source</a>
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br/>
-        <small>Made with Nim. Generated: 2016-12-20 19:51:06 UTC</small>
+        <small>Made with Nim. Generated: 2016-12-20 20:01:39 UTC</small>
       </div>
     </div>
   </div>

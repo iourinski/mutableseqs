@@ -120,7 +120,7 @@ proc groupBy*[T](
   ## shorter notation for groupBy, only works for tuples, if the sequence is not made of tuples
   ## an exception is thrown, moreover the keys in result will be cast to string
   ## in case a more general construction is needed, use "long notation" with full proc call passed
-  ## .. code-bloc
+  ## .. code-block::
   ##   type   rndTuple = tuple[a: int,b: string] 
   ##   proc getA(x: rndTuple): int = x.a
   ##   proc getB(x: rndTuple): string = x.b
