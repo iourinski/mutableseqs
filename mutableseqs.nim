@@ -21,6 +21,12 @@ type
     key: T,
     value: U
   ]
+proc revert*[T](input: seq[T]): seq[T] =
+  ## returns a new sequence that is inverted input
+  result = newSeq[T]()
+  for idx in countdown(input.high,0):
+    result.add(input[idx])
+    
 proc groupBy*[T,U](
   input: var seq[T],
   action: proc(x: T): U
@@ -121,12 +127,12 @@ proc groupBy*[T](
   ## an exception is thrown, moreover the keys in result will be cast to string
   ## in case a more general construction is needed, use "long notation" with full proc call passed
   ## .. code-block::
-  ##   type   rndTuple = tuple[a: int,b: string] 
-  ##   proc getA(x: rndTuple): int = x.a
-  ##   proc getB(x: rndTuple): string = x.b
-  ##   var a: seq[rndTuple] = @[(1,"a"),(2,"b"),(3,"b"),(4,"a")]
-  ##   assert a.groupBy(proc(x: rndTuple): string = x.b) 
-  ##     == a.groupBy("b")
+  ##    type   rndTuple = tuple[a: int,b: string] 
+  ##    proc getA(x: rndTuple): int = x.a
+  ##    proc getB(x: rndTuple): string = x.b
+  ##    var a: seq[rndTuple] = @[(1,"a"),(2,"b"),(3,"b"),(4,"a")]
+  ##    assert a.groupBy(proc(x: rndTuple): string = x.b) 
+  ##      == a.groupBy("b")
   ##   
   result = newSeq[KVPair[string,seq[T]]]()
   var
@@ -252,7 +258,7 @@ proc transform*[T, U](x: var seq[T], act: proc(y: T): U): seq[U] =
       item  = x[lastIdx]
     result.add(act(item))
     x.delete(lastIdx, lastIdx)
-  return result
+  return revert(result)
 
 proc makePairs*[T, U](
    x: seq[T], tr: proc(zz: T): U, wt: proc (zz: T, yy: T): float
