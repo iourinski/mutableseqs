@@ -24,8 +24,8 @@ type
 proc revert*[T](input: seq[T]): seq[T] =
   ## returns a new sequence that is inverted input
   result = newSeq[T]()
-  for idx in countdown(input.high,0):
-    result.add(input[idx])
+  for item in input:
+    result = result.concat(@[item])
     
 proc groupBy*[T,U](
   input: var seq[T],
@@ -257,7 +257,7 @@ proc transform*[T, U](x: var seq[T], act: proc(y: T): U): seq[U] =
       lastIdx = x.len - 1
       item  = x[lastIdx]
     result.add(act(item))
-    x.delete(lastIdx, lastIdx)
+    #x.delete(lastIdx, lastIdx)
   return revert(result)
 
 proc makePairs*[T, U](
@@ -293,7 +293,8 @@ proc makePairs*[T, U](
   var lx = x.high
   for i in countdown(lx, 0):
     var y = x[i]
-    for j in countup(0, i-1):
+    let up = if x.len > i - 1: i - 1 else: x.high
+    for j in countup(0, up):
       var 
         z = x[j]
         t1,t2: WtPair[U]
@@ -301,11 +302,12 @@ proc makePairs*[T, U](
         second: U = tr(z)
         weight: float = wt(y,z)
       
-      if first != second:
-         t1 = (first,second,weight)
-         t2 = (second,first,weight)
-         result.add(t1)
-         result.add(t2)
+      if first != second and  first != nil and second != nil:
+        
+        t1 = (first, second, weight)
+        t2 = (second, first, weight)
+        result.add(t1)
+        result.add(t2)
   return result
 
 proc take*[T](x: var seq[T], numIt: int): seq[T] =
