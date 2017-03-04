@@ -21,12 +21,12 @@ type
     key: T,
     value: U
   ]
-proc revert*[T](input: seq[T]): seq[T] =
+proc revert*[T](input: var seq[T]): seq[T] =
   ## returns a new sequence that is inverted input
   result = newSeq[T]()
   for item in input:
     result = result.concat(@[item])
-    
+
 proc groupBy*[T,U](
   input: var seq[T],
   action: proc(x: T): U
@@ -244,21 +244,24 @@ proc flatMap*[T, U]( x: var seq[T], tr: proc(y: T): seq[U]): seq[U] =
 #      result.add(subitem)
 #  return result
 
-proc transform*[T, U](x: var seq[T], act: proc(y: T): U): seq[U] =
+proc transform*[T, U](x:  seq[T], act: proc(y: T): U): seq[U] =
   ## Same as apply from sequtils, but can produce a sequence of different type, destroys input to save space
   ## .. code-block::
   ##    var s = @[1,2,4,5]
   ##    assert s.transform(proc(x: int): float = 1.0 / x.float) == @[1.0,0.5,0.25,0.2]
-  var 
-    result = newSeq[U]()
-    l = x.len - 1
-  for i in countup(0, l):
-    var 
-      lastIdx = x.len - 1
-      item  = x[lastIdx]
-    result.add(act(item))
+  result = newSeq[U]()
+  for item in x:
+    result = result.concat(@[act(item)])
+  #var 
+  #  result = newSeq[U]()
+  #  l = x.len - 1
+  #for i in countup(0, l):
+  #  var 
+  #    lastIdx = x.len - 1
+  #    item  = x[lastIdx]
+  #  result.add(act(item))
     #x.delete(lastIdx, lastIdx)
-  return revert(result)
+  #return revert(result)
 
 proc makePairs*[T, U](
    x: seq[T], tr: proc(zz: T): U, wt: proc (zz: T, yy: T): float
