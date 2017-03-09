@@ -171,26 +171,22 @@ proc groupByReducing*[T, U, V](
   ##         (key: a, value: @[4, 1]), 
   ##         (key: b, value: @[3, 2])
   ##        ]
-
+  result = newSeq[KVPair[U,seq[V]]]()
   var 
-    result = newSeq[KVPair[U,seq[V]]]()
-    ind: int = 0
     idxTable = initTable[U, int]()
     lx = input.high
-  for i in countdown(lx, 0):
-    var item = input[i]
-    if (idxTable.hasKey(action(item))):
-       result[idxTable[action(item)]].value.add(transf(item))
+  for idx in countdown(lx, 0):
+    var item = input[idx]
+    let 
+      trKey = action(item)  
+    if (idxTable.hasKey(trKey)):
+      result[idxTable[trKey]].value.add(transf(item))
     else:
-      var 
-        i = action(item)
-        emptyS = newSeq[V]()
-      emptyS.add(transf(item))
-      var  newTuple: KVPair[U, seq[V]] = (i, emptyS)
+      var  newTuple: KVPair[U, seq[V]] = (trKey, @[transf(item)])
       result.add(newTuple)
-      idxTable.add(action(item), ind)
-      ind = ind + 1
-    input.delete(i, i)
+      let iii = result.high
+      idxTable.add(trKey, iii)
+    input.delete(idx, idx)
   return result
 
 proc groupByKeeping*[T, U](
@@ -225,8 +221,8 @@ proc flatMap*[T, U]( x: var seq[T], tr: proc(y: T): seq[U]): seq[U] =
   ##      var v = @[("a",@[1,3,4],0.0),("b",@[3,4,5],4.6)]
   ##      assert v.flatMap(proc(x: tuple[a:string,b:seq[int],c:float]): seq[int]= x[1]) ==
   ##        @[3, 4, 5, 1, 3, 4] 
+  result = newSeq[U]()
   var 
-    result: seq[U] = newSeq[U]()
     lx = x.high
   for i in countdown(lx, 0):
     let
@@ -251,7 +247,7 @@ proc transform*[T, U](x:  seq[T], act: proc(y: T): U): seq[U] =
   ##    assert s.transform(proc(x: int): float = 1.0 / x.float) == @[1.0,0.5,0.25,0.2]
   result = newSeq[U]()
   for item in x:
-    result = result.concat(@[act(item)])
+    result.add(act(item))
   #var 
   #  result = newSeq[U]()
   #  l = x.len - 1
@@ -315,9 +311,9 @@ proc makePairs*[T, U](
 
 proc take*[T](x: var seq[T], numIt: int): seq[T] =
   ## returns n first elements of sequence
+  result = newSeq[T]()
   if numIt >= x.len:
     return x
-  result = newSeq[T]()
   for i in countup(0, numIt - 1):
     result.add(x[i])
   x = newSeq[T]()
@@ -410,7 +406,7 @@ proc getMedian* [T](x: var seq[T], cmp: proc(y, z: T): bool): T =
       (x.len / 2).int
   return x[idx]
   
-proc min[T](x: seq[T]): T =
+proc min*[T](x: seq[T]): T =
   ## calculate a median for an array of things based on supplied comparison function
   if x.len == 0:
     return 
@@ -420,7 +416,7 @@ proc min[T](x: seq[T]): T =
         result = y
   return result
 
-proc zipWithIndex[T](x: seq[T]): seq[KVPair[int, T]] = 
+proc zipWithIndex*[T](x: seq[T]): seq[KVPair[int, T]] = 
   ## calculate a median for an array of things based on supplied comparison function
   result = newSeq[KVPair[int,  T]]()
   for y in 0 .. x.high:
